@@ -1,10 +1,10 @@
 <?php
 namespace App\Http\Controllers\Admin;
-
 use App\Http\Controllers\Controller;
 use App\Models\Formation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http; // ← Ajoute cette ligne
 
 class FormationController extends Controller
 {
@@ -54,5 +54,23 @@ class FormationController extends Controller
     public function retirerApprenant(Formation $formation, User $user) {
         $formation->apprenants()->detach($user->id);
         return redirect()->back()->with('success', 'Apprenant retiré !');
+    }
+
+    // ← Ajoute cette méthode
+    public function generateIA(Request $request) {
+        $response = Http::withToken(config('services.groq.api_key'))
+            ->post('https://api.groq.com/openai/v1/chat/completions', [
+                'model' => 'llama3-8b-8192',
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => 'Génère une description de formation structurée (objectifs, contenu, durée) sur : ' . $request->input('prompt')
+                    ]
+                ]
+            ]);
+
+        return response()->json([
+            'description' => $response->json('choices.0.message.content')
+        ]);
     }
 }

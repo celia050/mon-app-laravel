@@ -38,6 +38,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('resultats', [ResultatController::class, 'index'])->name('resultats.index');
     Route::post('formations/{formation}/ajouter', [FormationController::class, 'ajouterApprenant'])->name('formations.ajouter');
     Route::delete('formations/{formation}/retirer/{user}', [FormationController::class, 'retirerApprenant'])->name('formations.retirer');
+    Route::post('generate-ia', [FormationController::class, 'generateIA'])->name('generate-ia');
+
 });
 
 Route::middleware('auth')->group(function () {
